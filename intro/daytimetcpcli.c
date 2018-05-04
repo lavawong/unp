@@ -1,14 +1,6 @@
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <stdio.h>
-#include <stdlib.h>
-/* Miscellaneous constants */
-#define	MAXLINE		4096	/* max text line length */
-#define	BUFFSIZE	8192	/* buffer size for reads and writes */
-/* Following shortens all the typecasts of pointer arguments: */
-#define	SA	struct sockaddr
+#include <string.h>
+#include "unp.h"
+/* China time server 210.72.145.8 */
 int
 main(int argc, char **argv)
 {
@@ -17,13 +9,12 @@ main(int argc, char **argv)
     struct sockaddr_in servaddr;
 
     if (argc != 2) {
-        printf("usage: a.out <IPaddress>\n");
+        err_sys("usage: a.out <IPaddress>\n");
         return 1;
     }
 
     if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-        printf("socket error\n");
-        return 1;
+        err_sys("socket error\n");
     }
 
     bzero(&servaddr, sizeof(servaddr));
@@ -31,26 +22,22 @@ main(int argc, char **argv)
     servaddr.sin_port = htons(13);
 
     if (inet_pton(AF_INET, argv[1], &servaddr.sin_addr) <= 0) {
-        printf("inet_pton error for %s\n", argv[1]);
-        return 1;
+        err_quit("inet_pton error for %s\n", argv[1]);
     }
 
     if (connect(sockfd, (SA *) &servaddr, sizeof(servaddr)) < 0 ) {
-        printf("connect error\n");
-        return 1;
+        err_sys("connect error\n");
     }
 
     while ( (n = read(sockfd, recvline, MAXLINE)) > 0) {
         recvline[n] = 0;
         if (fputs(recvline, stdout) == EOF) {
-            printf("fputs error\n");
-            return 1;
+            err_sys("fputs error\n");
         }
     }
 
     if (n < 0) {
-        printf("read error\n");
-        return 1;
+        err_sys("read error\n");
     }
 
     exit(0);
