@@ -6,7 +6,7 @@ main(int argc, char **argv)
 {
     int sockfd, n;
     char recvline[MAXLINE + 1];
-    struct sockaddr_in servaddr;
+    struct sockaddr_in6 servaddr;
 
     if (argc != 2) {
         err_quit("usage: a.out <IPaddress>\n");

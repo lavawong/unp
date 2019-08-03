@@ -68,13 +68,14 @@ static void err_doit(
                 va_list a_list
             )
 {
+    int errno_save;
     char buf[MAXLINE];
+    errno_save = errno;
     vsnprintf(buf, MAXLINE, fmt, a_list);
-
     if (errnoflag)
     {
         size_t buf_len = strlen(buf);
-        snprintf(buf+buf_len, MAXLINE-strlen(buf), ": %s", strerror(error));
+        snprintf(buf+buf_len, MAXLINE-strlen(buf), ": %s", strerror(errno_save));
     }
 
     strcat(buf, "\n");

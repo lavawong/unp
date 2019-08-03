@@ -36,12 +36,23 @@
 #define	BUFFSIZE	8192	/* buffer size for reads and writes */
 /* Following shortens all the typecasts of pointer arguments: */
 #define	SA	struct sockaddr
+
+#ifndef LISTENQ
+/* Following could be derived from SOMAXCONN in <sys/socket.h>, but many
+   kernels still #define it as 5, while actually supporting many more */
+#define	LISTENQ		1024	/* 2nd argument to listen() */
+#endif /* LISTENQ */
+
 /* define wrapper function which should exit when error occurred */
-int Socket(int domain, int type, int protocol) __THROW;
-int Bind (int fd, __CONST_SOCKADDR_ARG addr, socklen_t len);
-int Connect (int fd, __CONST_SOCKADDR_ARG addr, socklen_t len);
-int Accept (int fd, __SOCKADDR_ARG addr,
-            socklen_t *__restrict __addr_len);
+int  Socket(int family, int type, int protocol);
+void Bind (int fd, const struct sockaddr *addr, socklen_t len);
+void Connect (int fd, const struct sockaddr *addr, socklen_t len);
+void Listen (int fd, int port);
+int  Accept (int fd, const struct sockaddr *addr,
+            socklen_t *__restrict addr_len);
+void Close(int fd);
+
+ssize_t Write(int fd, const void *buff, size_t nbyte);
 
 void err_dump(const char *, ...); /* {App misc_source} */
 void err_msg(const char *, ...);
